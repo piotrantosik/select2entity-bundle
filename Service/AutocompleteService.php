@@ -34,12 +34,13 @@ class AutocompleteService
     /**
      * @param Request                  $request
      * @param string|FormTypeInterface $type
+     * @param mixed $data
      *
      * @return array
      */
-    public function getAutocompleteResults(Request $request, $type)
+    public function getAutocompleteResults(Request $request, $type, $data = null)
     {
-        $form = $this->formFactory->create($type);
+        $form = $this->formFactory->create($type, $data);
         $fieldOptions = $form->get($request->get('field_name'))->getConfig()->getOptions();
 
         /** @var EntityRepository $repo */
