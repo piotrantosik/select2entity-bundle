@@ -69,6 +69,11 @@ class AutocompleteService
             $cb = $fieldOptions['callback'];
 
             $cb($countQB, $request);
+            //reset joined select from count
+            $countQB->resetDQLPart('select');
+            $countQB
+                ->addSelect($countQB->expr()->count('e'));
+
             $cb($resultQb, $request);
         }
 
