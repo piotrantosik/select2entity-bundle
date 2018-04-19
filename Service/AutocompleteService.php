@@ -2,7 +2,7 @@
 
 namespace Tetranz\Select2EntityBundle\Service;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormTypeInterface;
@@ -25,7 +25,7 @@ class AutocompleteService
      * @param FormFactoryInterface $formFactory
      * @param ManagerRegistry      $doctrine
      */
-    public function __construct(FormFactoryInterface $formFactory, ManagerRegistry $doctrine)
+    public function __construct(FormFactoryInterface $formFactory, RegistryInterface $doctrine)
     {
         $this->formFactory = $formFactory;
         $this->doctrine = $doctrine;
