@@ -29,7 +29,7 @@ class AutocompleteService
     {
         $this->formFactory = $formFactory;
         $this->doctrine = $doctrine;
-    }   
+    }
 
     /**
      * @param Request                  $request
@@ -65,6 +65,14 @@ class AutocompleteService
             ->setMaxResults($maxResults)
             ->setFirstResult($offset)
         ;
+
+        if ($request->get('exclude') && $exclude = explode(',', $request->get('exclude'))) {
+            if (\count($exclude) > 0) {
+                $resultQb
+                    ->andWhere('e.id NOT IN (:exclude)')
+                    ->setParameter('exclude', $exclude);
+            }
+        }
 
         if (is_callable($fieldOptions['callback'])) {
             $cb = $fieldOptions['callback'];
