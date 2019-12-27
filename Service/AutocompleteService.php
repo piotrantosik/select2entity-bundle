@@ -2,7 +2,7 @@
 
 namespace Tetranz\Select2EntityBundle\Service;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormTypeInterface;
@@ -25,11 +25,11 @@ class AutocompleteService
      * @param FormFactoryInterface $formFactory
      * @param ManagerRegistry      $doctrine
      */
-    public function __construct(FormFactoryInterface $formFactory, ManagerRegistry $doctrine)
+    public function __construct(FormFactoryInterface $formFactory, RegistryInterface $doctrine)
     {
         $this->formFactory = $formFactory;
         $this->doctrine = $doctrine;
-    }   
+    }
 
     /**
      * @param Request                  $request
@@ -64,6 +64,14 @@ class AutocompleteService
             ->setMaxResults($maxResults)
             ->setFirstResult($offset)
         ;
+
+        if ($request->get('exclude') && $exclude = explode(',', $request->get('exclude'))) {
+            if (\count($exclude) > 0) {
+                $resultQb
+                    ->andWhere('e.id NOT IN (:exclude)')
+                    ->setParameter('exclude', $exclude);
+            }
+        }
 
         if (is_callable($fieldOptions['callback'])) {
             $cb = $fieldOptions['callback'];
