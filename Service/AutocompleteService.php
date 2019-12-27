@@ -34,7 +34,6 @@ class AutocompleteService
     /**
      * @param Request                  $request
      * @param string|FormTypeInterface $type
-     * @param mixed $data
      *
      * @return array
      */
