@@ -40,12 +40,12 @@ class AutocompleteService
     public function getAutocompleteResults(Request $request, $type, $data = null)
     {
         $form = $this->formFactory->create($type, $data);
-        $fieldOptions = $form->get($request->get('field_name'))->getConfig()->getOptions();
+        $fieldOptions = $form->get($this->getParameter($request, 'field_name'))->getConfig()->getOptions();
 
         /** @var EntityRepository $repo */
         $repo = $this->doctrine->getRepository($fieldOptions['class']);
 
-        $term = $request->get('q');
+        $term = $this->getParameter($request, 'q');
 
         $countQB = $repo->createQueryBuilder('e');
         $countQB
@@ -55,7 +55,7 @@ class AutocompleteService
         ;
 
         $maxResults = $fieldOptions['page_limit'];
-        $offset = ($request->get('page', 1) - 1) * $maxResults;
+        $offset = ($this->getParameter($request, 'page', 1) - 1) * $maxResults;
 
         $resultQb = $repo->createQueryBuilder('e');
         $resultQb
@@ -65,7 +65,7 @@ class AutocompleteService
             ->setFirstResult($offset)
         ;
 
-        if ($request->get('exclude') && $exclude = explode(',', $request->get('exclude'))) {
+        if ($this->getParameter($request, 'exclude') && $exclude = explode(',', $this->getParameter($request, 'exclude'))) {
             if (\count($exclude) > 0) {
                 $resultQb
                     ->andWhere('e.id NOT IN (:exclude)')
@@ -97,5 +97,13 @@ class AutocompleteService
         }, $paginationResults);
 
         return $result;
+    }
+
+    /**
+     * Request::get() is deprecated since Symfony 7.4; select2 sends GET, keep POST working as before.
+     */
+    private function getParameter(Request $request, string $key, mixed $default = null): mixed
+    {
+        return $request->query->get($key) ?? $request->request->get($key) ?? $default;
     }
 }
